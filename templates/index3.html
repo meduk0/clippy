@@ -1,0 +1,564 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Clippy - Multimodal Search</title>
+        <style>
+            :root {
+                --blue: #4285f4;
+                --red: #ea4335;
+                --yellow: #fbbc05;
+                --green: #34a853;
+                --text-color: #1a1a1a;
+                --light-text: #6b7280;
+                --border-color: #e5e7eb;
+                --error-color: #ef4444;
+                --success-color: #10b981;
+                --shadow:
+                    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Helvetica, Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+                color: var(--text-color);
+                background-color: #f9fafb;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+
+            h1 {
+                text-align: center;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                font-size: 2.5rem;
+            }
+
+            h1 span {
+                display: inline-block;
+            }
+
+            /* Google-style colorful logo */
+            h1 span:nth-child(1) {
+                color: var(--blue);
+            }
+            h1 span:nth-child(2) {
+                color: var(--red);
+            }
+            h1 span:nth-child(3) {
+                color: var(--yellow);
+            }
+            h1 span:nth-child(4) {
+                color: var(--green);
+            }
+            h1 span:nth-child(5) {
+                color: var(--blue);
+            }
+            h1 span:nth-child(6) {
+                color: var(--red);
+            }
+
+            h2 {
+                font-weight: 600;
+                font-size: 1.5rem;
+                margin-top: 0;
+                margin-bottom: 1.5rem;
+            }
+
+            h3 {
+                font-weight: 600;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .card {
+                background-color: white;
+                border-radius: 0.75rem;
+                box-shadow: var(--shadow);
+                padding: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: var(--text-color);
+            }
+
+            input[type="file"] {
+                width: 100%;
+                padding: 0.5rem 0;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                border: 1px solid var(--border-color);
+                box-sizing: border-box;
+                transition: border-color 0.2s;
+                font-size: 1rem;
+            }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: var(--blue);
+                box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+            }
+
+            button,
+            input[type="submit"] {
+                background-color: var(--blue);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            button:hover,
+            input[type="submit"]:hover {
+                background-color: #3367d6;
+            }
+
+            .tabs {
+                display: flex;
+                margin-bottom: 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .tab-link {
+                background-color: transparent;
+                color: var(--light-text);
+                border: none;
+                border-bottom: 2px solid transparent;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                margin-right: 1rem;
+            }
+
+            .tab-link:hover {
+                color: var(--blue);
+            }
+
+            .tab-link.active {
+                color: var(--blue);
+                border-bottom: 2px solid var(--blue);
+                font-weight: 600;
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .query {
+                background-color: #f5f5f7;
+                border-radius: 0.75rem;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .query img {
+                max-width: 300px;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+                border-radius: 0.5rem;
+            }
+
+            .query p {
+                font-size: 1.1rem;
+                font-style: italic;
+                text-align: center;
+                margin-top: 1rem;
+            }
+
+            /* Split layout for results */
+            .results-container {
+                display: flex;
+                gap: 2rem;
+                margin-top: 2rem;
+            }
+
+            /* Modified to handle different types of results */
+            .text-results {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .image-results {
+                flex: 1;
+                min-width: 0;
+            }
+
+            /* Full width for image results when there are no text results */
+            .image-results.full-width {
+                flex: 2;
+                width: 100%;
+            }
+
+            .semantic-result {
+                background-color: white;
+                border-radius: 0.75rem;
+                box-shadow: var(--shadow);
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                transition: transform 0.2s;
+            }
+
+            .semantic-result:hover {
+                transform: translateY(-3px);
+            }
+
+            .semantic-result h4 {
+                margin-top: 0;
+                color: var(--blue);
+                font-size: 1.1rem;
+            }
+
+            .semantic-result .rank {
+                font-size: 0.9rem;
+                color: var(--light-text);
+                margin-bottom: 0.5rem;
+            }
+
+            .semantic-result .text {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+
+            .results {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .result-item {
+                background-color: white;
+                border-radius: 0.75rem;
+                overflow: hidden;
+                box-shadow: var(--shadow);
+                transition: transform 0.2s;
+            }
+
+            .result-item:hover {
+                transform: translateY(-5px);
+            }
+
+            .result-item img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+            }
+
+            .score {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                color: var(--light-text);
+                text-align: center;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .alert {
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+                font-weight: 500;
+                text-align: center;
+            }
+
+            .alert-error {
+                background-color: rgba(239, 68, 68, 0.1);
+                color: var(--error-color);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+            }
+
+            .loading {
+                display: none;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .loading-spinner {
+                display: inline-block;
+                width: 50px;
+                height: 50px;
+                border: 4px solid rgba(66, 133, 244, 0.1);
+                border-radius: 50%;
+                border-top-color: var(--blue);
+                animation: spin 1s ease-in-out infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Logo container */
+            .logo-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+
+            .logo-img {
+                height: 50px;
+                margin-right: 1rem;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .results-container {
+                    flex-direction: column;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="logo-container">
+                <img
+                    src="{{ url_for('static', filename='clippy.webp') }}"
+                    alt="Clippy Logo"
+                    class="logo-img"
+                />
+                <h1>
+                    <span>C</span><span>l</span><span>i</span><span>p</span
+                    ><span>p</span><span>y</span>
+                </h1>
+            </div>
+
+            <div class="tabs">
+                <button
+                    class="tab-link active"
+                    onclick="openTab(event, 'image-search')"
+                >
+                    Image Search
+                </button>
+                <button
+                    class="tab-link"
+                    onclick="openTab(event, 'text-search')"
+                >
+                    Text Search
+                </button>
+            </div>
+
+            <div
+                id="error-message"
+                class="alert alert-error"
+                style="display: none"
+            ></div>
+
+            <div id="image-search" class="tab-content active card">
+                <h2>Search by Image</h2>
+                <form
+                    id="image-form"
+                    method="POST"
+                    enctype="multipart/form-data"
+                >
+                    <div class="form-group">
+                        <label for="query_img">Upload an image:</label>
+                        <input
+                            type="file"
+                            name="query_img"
+                            id="query_img"
+                            accept="image/*"
+                            required
+                        />
+                    </div>
+                    <input type="submit" value="Search" />
+                </form>
+            </div>
+
+            <div id="text-search" class="tab-content card">
+                <h2>Search by Text</h2>
+                <form id="text-form" method="POST">
+                    <div class="form-group">
+                        <label for="query_text">Enter a description:</label>
+                        <input
+                            type="text"
+                            name="query_text"
+                            id="query_text"
+                            placeholder="Example: a photo of a cat"
+                            required
+                        />
+                    </div>
+                    <input type="submit" value="Search" />
+                </form>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Clippy is working ...</p>
+            </div>
+
+            <div id="query-container"></div>
+
+            <div class="results-container" id="results-container">
+                <div id="text-results-container" class="text-results"></div>
+                <div id="image-results-container" class="image-results"></div>
+            </div>
+        </div>
+
+        <script>
+            // Tab functionality
+            function openTab(evt, tabName) {
+                const tabcontent = document.getElementsByClassName("tab-content");
+                for (let i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].classList.remove("active");
+                }
+
+                const tablinks = document.getElementsByClassName("tab-link");
+                for (let i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("active");
+                }
+
+                document.getElementById(tabName).classList.add("active");
+                evt.currentTarget.classList.add("active");
+
+                // Clear error message when switching tabs
+                hideErrorMessage();
+            }
+
+            // Display error message
+            function showErrorMessage(message) {
+                const errorElement = document.getElementById("error-message");
+                errorElement.textContent = message;
+                errorElement.style.display = "block";
+            }
+
+            // Hide error message
+            function hideErrorMessage() {
+                document.getElementById("error-message").style.display = "none";
+            }
+
+            // Show loading spinner
+            function showLoading() {
+                document.getElementById("loading").style.display = "block";
+            }
+
+            // Hide loading spinner
+            function hideLoading() {
+                document.getElementById("loading").style.display = "none";
+            }
+
+            // Form validation and submission
+            document.getElementById("image-form").addEventListener("submit", function(event) {
+                const fileInput = document.getElementById("query_img");
+                if (fileInput.files.length === 0) {
+                    event.preventDefault();
+                    showErrorMessage("Please select an image file to search with");
+                    return false;
+                }
+
+                hideErrorMessage();
+                showLoading();
+                // Form will submit normally
+            });
+
+            document.getElementById("text-form").addEventListener("submit", function(event) {
+                const textInput = document.getElementById("query_text");
+                if (!textInput.value.trim()) {
+                    event.preventDefault();
+                    showErrorMessage("Please enter a text description to search with");
+                    return false;
+                }
+
+                hideErrorMessage();
+                showLoading();
+                // Form will submit normally
+            });
+
+            // Check if there are query or results to display
+            window.addEventListener("DOMContentLoaded", function() {
+                // If this is the initial page load with no query or results
+                const urlParams = new URLSearchParams(window.location.search);
+                const hasQueryParams = urlParams.has("query_img") || urlParams.has("query_text");
+
+                if (!hasQueryParams && !document.getElementById("query-container").innerHTML.trim()) {
+                    showErrorMessage("Enter an image or text query to search the collection");
+                }
+            });
+
+            {% if query_path %}
+            document.getElementById("query-container").innerHTML = `
+                <div class="query">
+                    <h3>Query Image:</h3>
+                    <img src="{{ query_path }}" alt="Query image" />
+                </div>
+            `;
+            {% elif query_text %}
+            document.getElementById("query-container").innerHTML = `
+                <div class="query">
+                    <h3>Query Text:</h3>
+                    <p>"{{ query_text }}"</p>
+                </div>
+            `;
+            {% endif %}
+
+            {% if semantic_results %}
+            document.getElementById("text-results-container").innerHTML = `
+                <h2>Semantic Text Results:</h2>
+                <div class="semantic-results">
+                    {% for result in semantic_results %}
+                    <div class="semantic-result">
+                        <div class="rank">Rank: {{ result.rank }}, Score: {{ "%.4f"|format(result.score) }}</div>
+                        <h4>{{ result.title }}</h4>
+                        <div class="text">{{ result.text }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            `;
+            {% endif %}
+
+            {% if scores %}
+            document.getElementById("image-results-container").innerHTML = `
+                <h2>Image Results:</h2>
+                <div class="results">
+                    {% for score, path in scores %}
+                    <div class="result-item">
+                        <a href="{{ url_for('static', filename=path) }}" target="_blank">
+                            <img src="{{ url_for('static', filename=path) }}" alt="Result" />
+                        </a>
+                        <div class="score">
+                            Similarity: {{ "%.1f"|format(score * 100) }}%
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            `;
+
+            // If there are only image results but no text results, make image results full width
+            {% if not semantic_results %}
+                document.getElementById("text-results-container").style.display = "none";
+                document.getElementById("image-results-container").classList.add("full-width");
+            {% endif %}
+            {% endif %}
+        </script>
+    </body>
+</html>
