@@ -235,8 +235,8 @@ def main():
     parser.add_argument("--query", type=str, help="Search query")
     parser.add_argument("--force_rebuild", action="store_true", help="Force rebuilding the index")
     parser.add_argument("--top_k", type=int, default=10, help="Number of top results to return")
-    parser.add_argument("--index_file", default="faiss_index.bin", help="Path to index file")
-    parser.add_argument("--embeddings_file", default="embeddings.pkl", help="Path to embeddings file")
+    parser.add_argument("--index_file", default="static/txt_embedding/faiss_index.bin", help="Path to index file")
+    parser.add_argument("--embeddings_file", default="static/txt_embedding/embeddings.pkl", help="Path to embeddings file")
     parser.add_argument("--device", choices=["cuda", "cpu"], help="Device to use (default: auto)")
     parser.add_argument("--model", default="sentence-transformers/all-MiniLM-L6-v2",
                         help="Transformer model to use for embeddings")

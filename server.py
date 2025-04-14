@@ -16,7 +16,7 @@ fe = CLIPFeatureExtractor()
 # Initialize semantic search for text
 semantic_searcher = SemanticSearch()
 # Set the JSON file path - update this to your actual path
-json_file_path ="wikipedia_paragraphs_train.json"
+json_file_path ="static/wikipedia_paragraphs_train.json"
 # Load paragraphs and build index (will load from cache if available)
 semantic_searcher.load_paragraphs_from_json(json_file_path)
 semantic_searcher.build_index()
