@@ -58,9 +58,10 @@ The text corpus is derived from the [agentlans/wikipedia-paragraphs](https://hug
 - [OpenCLIP](https://github.com/mlfoundations/open_clip)
 - Flask
 - NumPy
-- scikit-learn
 - Pillow
-- open
+- datasets
+- faiss
+## setup 
 clone the repository
 ```bash
 git clone https://github.com/meduk0/clippy
@@ -73,7 +74,6 @@ python3.8 -m venv env  # creating a virtual environment
 source env/bin/activate # activating the virtual environment
 pip install -r requirements.txt
 ```
-Enjoy!
 ---
 
 ## 🧠 How It Works
