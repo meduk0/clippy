@@ -1,0 +1,26 @@
+# Core libraries
+numpy
+pandas
+tqdm
+regex
+json
+
+# Web framework
+flask
+
+# Image processing
+Pillow
+
+# Transformers & CLIP
+transformers
+open-clip-torch
+datasets
+
+# Torch
+torch
+
+# FAISS with GPU support else use faiss-gpu
+faiss-gpu
+
+# Optional (used in your code)
+argparse

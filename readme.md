@@ -1,21 +1,22 @@
-Clippy 🧠🔍
+# Clippy 🧠🔍
 
-Clippy is a lightweight multimodal semantic search engine that allows users to perform similarity-based searches using either image or text queries. It leverages OpenCLIP for image embeddings and Sentence-Transformers for text embeddings. The app features a simple web interface powered by Flask and returns the most relevant images or text snippets from local datasets.
+**Clippy** is a lightweight multimodal semantic search engine that allows users to perform similarity-based searches using either image or text queries. It leverages OpenCLIP for image embeddings and Sentence-Transformers for text embeddings. The app features a simple web interface powered by Flask and returns the most relevant images or text snippets from local datasets.
 
-🚀 Features
+---
 
-🔎 Image-to-Image Search: Upload an image and find visually similar images using CLIP-based embeddings.
+## 🚀 Features
 
-📝 Text-to-Text Search: Enter a text query and retrieve the most semantically similar paragraphs.
+- 🔎 **Image-to-Image Search**: Upload an image and find visually similar images using CLIP-based embeddings.
+- 📝 **Text-to-Text Search**: Enter a text query and retrieve the most semantically similar paragraphs.
+- 🖼️ **Text-to-Image & Image-to-Text** (coming soon!): Cross-modal search functionality planned.
+- 📁 **Local Embedding Storage**: Uses `.npy` files for fast cosine similarity lookup.
+- 🧪 Optimized for experimentation, rapid prototyping, and local inference.
 
-🖼️ Text-to-Image & Image-to-Text (coming soon!): Cross-modal search functionality planned.
+---
 
-📁 Local Embedding Storage: Uses .npy files for fast cosine similarity lookup.
+## 🧱 Project Structure
 
-🧪 Optimized for experimentation, rapid prototyping, and local inference.
-
-🧱 Project Structure
-
+```txt
 ../clippy/
 ├── clipextract.py              # OpenCLIP model for image embeddings
 ├── semantic_search.py          # Sentence-Transformers model for text embeddings
@@ -29,53 +30,89 @@ Clippy is a lightweight multimodal semantic search engine that allows users to p
 ├── templates
 │   └── index3.html             # Web frontend template
 ├── text_db_extract.py          # Extracts and prepares the text dataset
+├── img_down.py                 # Extracts and prepares the image dataset (download them for local use )
+```
+---
+## 📚 Datasets
 
-⚙️ Requirements
+### 🖼️ Image Dataset
 
-Python 3.8+
+The image dataset is from [Unsplash Lite](https://unsplash.com/data), available at:
 
-Hugging Face Transformers
+```
+DOWNLOAD_URL = "https://unsplash-datasets.s3.amazonaws.com/lite/latest/unsplash-research-dataset-lite-latest.zip"
+```
 
-OpenCLIP
+It contains a selection of curated images suitable for lightweight training and inference tasks (400mb) .
 
-Flask
+### 📄 Text Dataset
 
-NumPy
+The text corpus is derived from the [agentlans/wikipedia-paragraphs](https://huggingface.co/datasets/agentlans/wikipedia-paragraphs) dataset. The file `wikipedia_paragraphs_train.json` contains sampled Wikipedia paragraphs used for semantic search.
 
-scikit-learn
+---
 
-Pillow
+## ⚙️ Requirements
 
+- Python 3.8+
+- [Hugging Face Transformers](https://github.com/huggingface/transformers)
+- [OpenCLIP](https://github.com/mlfoundations/open_clip)
+- Flask
+- NumPy
+- Pillow
+- datasets
+- faiss
+## setup 
+clone the repository
+```bash
+git clone https://github.com/meduk0/clippy
+cd clippy
+```
 Install dependencies:
-
+  first of all check the requirements.txt (choose either faiss-gpu or faiss-cpu)
+```bash
+python3.8 -m venv env  # creating a virtual environment
+source env/bin/activate # activating the virtual environment
 pip install -r requirements.txt
+```
+---
 
-🧠 How It Works
+## 🧠 How It Works
 
-🔹 Image Embeddings
+### 🔹 Image Embeddings
 
-clipextract.py uses OpenCLIP to generate .npy files for each image in the dataset. These vectors are stored in static/clipfeature.
+`clipextract.py` uses OpenCLIP to generate `.npy` files for each image in the dataset. These vectors are stored in `static/clipfeature`.
 
-🔹 Text Embeddings
+### 🔹 Text Embeddings
 
-semantic_search.py uses Sentence-Transformers to encode paragraphs from the wikipedia_paragraphs_train.json file and saves them into static/txt_embeddings.
+`semantic_search.py` uses Sentence-Transformers to encode paragraphs from the `wikipedia_paragraphs_train.json` file and saves them into `static/txt_embeddings`.
 
-🔹 Web Interface
+### 🔹 Web Interface
 
-The Flask app (server.py) serves a simple frontend from index3.html, allowing users to search using an image or text prompt.
+The Flask app (`server.py`) serves a simple frontend from `index3.html`, allowing users to search using an image or text prompt.
 
-🖥️ Running the App
+---
 
+## 🖥️ Running the App
+
+```bash
 python server.py
+```
 
-Then go to http://localhost:5000 in your browser.
+Then go to [http://localhost:5000](http://localhost:5000) in your browser.
 
-📦 TODO
+---
 
+## 📦 TODO
+- [ ] Responsive frontend improvements
+- [ ] add windows support (linux only for now )
 
+---
 
-📄 License
+## 📄 License
 
-MIT License. See LICENSE for more information.
+MIT License. See [LICENSE](LICENSE) for more information.
+
+---
 
 Let me know if you want badges, deployment instructions (Docker, Hugging Face Spaces), or a section on contributing!
+Also , facing any problem just open an issue and we will discuss stuff :)
